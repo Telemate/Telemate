@@ -27,11 +27,16 @@ class App extends React.Component {
             [e.target.query]: e.target.value,
         });
     };
-
+    getCurrentTime=()=>{
+        return new Date().getDate() + "/" + new Date().getMonth()
+            + "/" + new Date().getFullYear() + " @ "
+            + new Date().getHours() + ":"
+            + new Date().getMinutes() + ":" + new Date().getSeconds();
+    }
     handlesubmit = (e) => {
         e.preventDefault()
         this.setState({ query: "" })
-        this.state.details.push({ query: this.state.query, response: "" })
+        this.state.details.push({ query: {text:this.state.query,time:this.getCurrentTime()}, response: {text:"",time:""}} );
         console.log("details 1 = ", this.state.details)
         this.setState({
             details: this.state.details,
@@ -40,10 +45,12 @@ class App extends React.Component {
             query: this.state.query,
         }).then((res) => {
             console.log(res.data)
-            this.state.details[this.state.details.length - 1].response = res.data.response
+            this.state.details[this.state.details.length - 1].response.text = res.data.response
+            this.state.details[this.state.details.length - 1].response.time = this.getCurrentTime();
             this.setState({
                 details: this.state.details,
             });
+            console.log("full details = "+this.state.details);
 
         })
             .catch(() => {
@@ -114,38 +121,31 @@ class App extends React.Component {
                         {this.state.details.map((detail) => (
                             <div>
                                 <main className="msger-chat">
-                                    {String((detail.query)).length !== 0 ?
+                                    {String((detail.query.text)).length !== 0 ?
                                         <div className="msg right-msg">
                                             <div className="msg-img" id="man-image"></div>
                                             <div className="msg-bubble">
                                                 <div className="msg-info">
                                                     <div className="msg-info-name">Me</div>
-                                                    <div className="msg-info-time">{new Date().getDate() + "/" + new Date().getMonth()
-                                                        + "/" + new Date().getFullYear() + " @ "
-                                                        + new Date().getHours() + ":"
-                                                        + new Date().getMinutes() + ":" + new Date().getSeconds()}</div>
+                                                    <div className="msg-info-time">{detail.query.time}</div>
                                                 </div>
                                                 <div className="msg-text">
-                                                    {detail.query}
+                                                    {detail.query.text}
                                                 </div>
                                             </div>
                                         </div>
-                                        : ""
-                                          }
-                                    {String((detail.response)) !== "" ?
+                                        : ""}
+                                    {String((detail.response.text)) !== "" ?
                                         <div className="msg left-msg">
                                             <div className="msg-img" id="bot-image"></div>
                                             <div className="msg-bubble">
                                                 <div className="msg-info">
                                                     <div className="msg-info-name">Telemate</div>
                                                     <div className="msg-info-time">
-                                                        {new Date().getDate() + "/" + new Date().getMonth()
-                                                            + "/" + new Date().getFullYear() + " @ "
-                                                            + new Date().getHours() + ":"
-                                                            + new Date().getMinutes() + ":" + new Date().getSeconds()}</div>
+                                                        {detail.response.time}</div>
                                                 </div>
                                                 <div className="msg-text">
-                                                    {detail.response}
+                                                    {detail.response.text}
                                                 </div>
                                             </div>
                                         </div>
@@ -154,7 +154,6 @@ class App extends React.Component {
                                                 <div className="snippet" data-title=".dot-falling">
                                                     <div className="stage">
                                                         <div className="dot-falling"></div>
-
                                                     </div>
                                                 </div>
                                             </div>
